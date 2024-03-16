@@ -1,7 +1,7 @@
 'use client'
 
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, Stack, Box, Tabs, TextInput, Card, Paper, Title, Image, Button } from '@mantine/core';
+import { Modal, Stack, Box, Tabs, Group, TextInput, Card, Paper, Title, Image, Button } from '@mantine/core';
 import { useState, useEffect, use } from 'react'
 
 import styles from "./page.module.css";
@@ -42,7 +42,7 @@ const SkipButton = (props: SkipButtonProps) => {
 
   return (
     // <Button onClick={props.handleSkipCountry} w="fit-content" color="tomato" size="compact-sm">
-    <Button onClick={() => setStartCountdown(true)} w="fit-content" color="tomato" size="compact-sm">
+    <Button onClick={() => setStartCountdown(true)} w="fit-content" color="#c91a25" size="compact-sm" variant="light">
       {/* {props.skipCountry ? `Skipping in ${countdown}`: 'Skip'} */}
       {startCountdown ? `Skipping in ${countdown}`: 'Skip'}
     </Button>
@@ -77,6 +77,7 @@ function QuickPlayModal(props: QuickPlayModalProps): JSX.Element {
   // const [activeCountry, setActiveCountry] = useState<string | null>(randonCountry.name.common);
   const [activeCountry, setActiveCountry] = useState<{} | null>((props.countries[Math.floor(Math.random() * 250)] as Country));
   const [skipCountry, setSkipCountry] = useState<boolean>(false);
+  const [value, setValue] = useState<string>('');
 
   console.group('%c    ', 'background: white')
   // console.log('props.countries:', (props.countries[Math.floor(Math.random() * 250)] as Country).name.common);
@@ -101,15 +102,18 @@ function QuickPlayModal(props: QuickPlayModalProps): JSX.Element {
     <Modal opened={opened} onClose={close} title="Quick Play" centered>
       <Stack>
         <Box>What country is this?</Box>
-        {activeCountry && <Box><img src={`${(activeCountry as Country).flags.png}`} /></Box>}
-        <Box>{}</Box>
-        <TextInput
-          aria-label="Country name"
-          // description="Type /skip to skip"
-          placeholder="Country name" size="lg"
-          onChange={() => {
-            // console.log('value:', value)
-          }}/>
+        {activeCountry && <Box><img style={{width:"100%"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
+        <Stack>
+          <TextInput
+            aria-label="Country name"
+            // description="Type /skip to skip"
+            placeholder="Country name" size="lg"
+            onChange={() => {
+              // console.log('value:', value)
+            }}
+            style={{flexGrow: 1}} />
+          <Button color="#2bdd66" style={{color:"#000"}}>Submit</Button>
+        </Stack>
         <SkipButton handleSkipCountry={handleSkipCountry} skipCountry={false} />
       </Stack>
     </Modal>
