@@ -1,36 +1,30 @@
 'use client'
 
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, Stack, Box, Tabs, Group, TextInput, Card, Paper, Title, Image, Button } from '@mantine/core';
+import { rem, Modal, Stack, Box, Tabs, Group, TextInput, Notification, Card, Paper, Title, Image, Button } from '@mantine/core';
+import { IconX, IconCheck } from '@tabler/icons-react';
+
 import { useState, useEffect, use } from 'react'
 
 import styles from "./page.module.css";
 
-interface QuickPlayModalProps {
-  countries: {}[];
-}
-
 interface SkipButtonProps {
-  skipCountry: boolean;
+  // skipCountry: boolean;
   // startCountdown: () => void
   // setStartCountdown: (value: boolean) => void;
   handleSkipCountry: () => void;
 }
 const SkipButton = (props: SkipButtonProps) => {
-  // const [skipCountry, setSkipCountry] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(3);
   const [startCountdown, setStartCountdown] = useState<boolean>(false);
 
   useEffect(() => {
-    // if (props.skipCountry) {
     if (startCountdown) {
       console.log('startCountdown:', startCountdown)
       const interval = setInterval(() => {
         setCountdown(countdown - 1);
       }, 1000);
       if (countdown === 0) {
-        // setSkipCountry(false);
-        // props.onClick();
         setCountdown(3);
         clearInterval(interval);
         setStartCountdown(false);
@@ -38,12 +32,10 @@ const SkipButton = (props: SkipButtonProps) => {
       }
       return () => clearInterval(interval);
     }
-  }, [startCountdown, props.skipCountry, countdown])
+  }, [startCountdown, countdown])
 
   return (
-    // <Button onClick={props.handleSkipCountry} w="fit-content" color="tomato" size="compact-sm">
     <Button onClick={() => setStartCountdown(true)} w="fit-content" color="#c91a25" size="compact-sm" variant="light">
-      {/* {props.skipCountry ? `Skipping in ${countdown}`: 'Skip'} */}
       {startCountdown ? `Skipping in ${countdown}`: 'Skip'}
     </Button>
   )
@@ -70,14 +62,17 @@ type Country = {
   }
 }
 
-function QuickPlayModal(props: QuickPlayModalProps): JSX.Element {
+function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   const [opened, { open, close }] = useDisclosure(true);
 
   // const randonCountry = (props.countries[Math.floor(Math.random() * 250)] as Country);
   // const [activeCountry, setActiveCountry] = useState<string | null>(randonCountry.name.common);
   const [activeCountry, setActiveCountry] = useState<{} | null>((props.countries[Math.floor(Math.random() * 250)] as Country));
-  const [skipCountry, setSkipCountry] = useState<boolean>(false);
+  // const [skipCountry, setSkipCountry] = useState<boolean>(false);
+  const [getNewCountry, setGetNewCountry] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
+  const [canCheckAnswer, setCanCheckAnswer] = useState<boolean>(false);
+  const [isCorrect, setIsCorrect] = useState<boolean>(false);
 
   console.group('%c    ', 'background: white')
   // console.log('props.countries:', (props.countries[Math.floor(Math.random() * 250)] as Country).name.common);
@@ -85,18 +80,51 @@ function QuickPlayModal(props: QuickPlayModalProps): JSX.Element {
   console.log('activeCountry:', activeCountry);
   console.groupEnd()
 
+  // useEffect(() => {
+  //   if (skipCountry) {
+  //     const newRandonCountry = (props.countries[Math.floor(Math.random() * 250)] as Country);
+  //     setActiveCountry(newRandonCountry);
+  //     setSkipCountry(false);
+  //   }
+  // }, [skipCountry])
   useEffect(() => {
-    if (skipCountry) {
+    if (getNewCountry) {
       const newRandonCountry = (props.countries[Math.floor(Math.random() * 250)] as Country);
       setActiveCountry(newRandonCountry);
-      setSkipCountry(false);
+      setGetNewCountry(false);
     }
-  }, [skipCountry])
+  }, [getNewCountry])
 
-  const handleSkipCountry = () => {
-    console.log('%chandleSkipCountry', 'color:gold')
-    setSkipCountry(prevState => !prevState);
+  // const handleSkipCountry = () => {
+  //   console.log('%chandleSkipCountry', 'color:gold')
+  //   setSkipCountry(prevState => !prevState);
+  // }
+
+  const handleGetNewCountry = () => {
+    setGetNewCountry(prevState => !prevState);
   }
+
+  const handleSubmitAnswer = (value: string) => {
+    console.log('value:', value, 'activeCountry:', (activeCountry as Country).name.common)
+    if (value.toLowerCase() === (activeCountry as Country).name.common.toLowerCase()) {
+      console.log('Correct!')
+      setIsCorrect(true);
+    } else {
+      console.log('Incorrect!')
+      setIsCorrect(false);
+    }
+  }
+
+  const handleCloseNotification = () => {
+    console.log('hey!')
+    setCanCheckAnswer(false);
+  }
+
+  // useEffect(() => {
+  //   setCanCheckAnswer(false)
+  // }, [isCorrect])
+
+  console.log('%ccanCheckAnswer:', 'color:tomato', canCheckAnswer);
 
   return (
     <Modal opened={opened} onClose={close} title="Quick Play" centered>
@@ -104,17 +132,25 @@ function QuickPlayModal(props: QuickPlayModalProps): JSX.Element {
         <Box>What country is this?</Box>
         {activeCountry && <Box><img style={{width:"100%"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
         <Stack>
+          {/* {canCheckAnswer &&
+            !isCorrect
+              ?
+              <Notification onClose={handleCloseNotification} withBorder color="red" style={{borderColor: "#c91a25", background: "rgba(201, 26, 37, 0.3)"}} icon={<IconX style={{ width: rem(20), height: rem(20) }} />}>
+                Incorrect!
+              </Notification>
+              :
+              <Notification onClose={handleCloseNotification} withBorder color="teal" style={{borderColor: "#339999", background: "rgba(51, 153, 153, 0.3)"}} icon={<IconCheck style={{ width: rem(20), height: rem(20) }} />}>
+                Correct!
+              </Notification>} */}
           <TextInput
             aria-label="Country name"
             // description="Type /skip to skip"
             placeholder="Country name" size="lg"
-            onChange={() => {
-              // console.log('value:', value)
-            }}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
             style={{flexGrow: 1}} />
-          <Button color="#2bdd66" style={{color:"#000"}}>Submit</Button>
+          <Button color="teal" style={{color:"#fff"}} onClick={() => handleSubmitAnswer(value)}>Submit</Button>
         </Stack>
-        <SkipButton handleSkipCountry={handleSkipCountry} skipCountry={false} />
+        <SkipButton handleSkipCountry={handleGetNewCountry} />
       </Stack>
     </Modal>
   )
