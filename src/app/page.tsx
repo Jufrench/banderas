@@ -120,7 +120,7 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
     <Modal style={{color: "#000"}} opened={opened} onClose={close} title="Quick Play" centered>
       <Stack>
         <Box color='#000'>What country is this?</Box>
-        {activeCountry && <Box><img style={{width:"100%"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
+        {activeCountry && <Box><img style={{width:"100%", border: "1px solid #bcbcbc"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
         <Stack>
           {showNotification && <NotificationComponent isCorrect={isCorrect} handleCloseNotification={handleCloseNotification} />}
           <TextInput
