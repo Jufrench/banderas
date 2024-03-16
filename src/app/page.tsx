@@ -11,15 +11,20 @@ interface QuickPlayModalProps {
 }
 
 interface SkipButtonProps {
-  handleSkipCountry: () => void;
   skipCountry: boolean;
+  // startCountdown: () => void
+  // setStartCountdown: (value: boolean) => void;
+  handleSkipCountry: () => void;
 }
 const SkipButton = (props: SkipButtonProps) => {
   // const [skipCountry, setSkipCountry] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(3);
+  const [startCountdown, setStartCountdown] = useState<boolean>(false);
 
   useEffect(() => {
-    if (props.skipCountry) {
+    // if (props.skipCountry) {
+    if (startCountdown) {
+      console.log('startCountdown:', startCountdown)
       const interval = setInterval(() => {
         setCountdown(countdown - 1);
       }, 1000);
@@ -28,14 +33,18 @@ const SkipButton = (props: SkipButtonProps) => {
         // props.onClick();
         setCountdown(3);
         clearInterval(interval);
+        setStartCountdown(false);
+        props.handleSkipCountry();
       }
       return () => clearInterval(interval);
     }
-  }, [props.skipCountry, countdown])
+  }, [startCountdown, props.skipCountry, countdown])
 
   return (
-    <Button onClick={props.handleSkipCountry} w="fit-content" color="tomato" size="compact-sm">
-      {props.skipCountry ? `Skipping in ${countdown}`: 'Skip'}
+    // <Button onClick={props.handleSkipCountry} w="fit-content" color="tomato" size="compact-sm">
+    <Button onClick={() => setStartCountdown(true)} w="fit-content" color="tomato" size="compact-sm">
+      {/* {props.skipCountry ? `Skipping in ${countdown}`: 'Skip'} */}
+      {startCountdown ? `Skipping in ${countdown}`: 'Skip'}
     </Button>
   )
 }
