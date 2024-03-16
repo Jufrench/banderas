@@ -20,7 +20,7 @@ const SkipButton = (props: SkipButtonProps) => {
 
   useEffect(() => {
     if (startCountdown) {
-      console.log('startCountdown:', startCountdown)
+      // console.log('startCountdown:', startCountdown)
       const interval = setInterval(() => {
         setCountdown(countdown - 1);
       }, 1000);
@@ -74,11 +74,11 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   const [canCheckAnswer, setCanCheckAnswer] = useState<boolean>(false);
   const [isCorrect, setIsCorrect] = useState<boolean>(false);
 
-  console.group('%c    ', 'background: white')
-  // console.log('props.countries:', (props.countries[Math.floor(Math.random() * 250)] as Country).name.common);
-  // console.log('randonCountry:', randonCountry.name.common);
-  console.log('activeCountry:', activeCountry);
-  console.groupEnd()
+  // console.group('%c    ', 'background: white')
+  // // console.log('props.countries:', (props.countries[Math.floor(Math.random() * 250)] as Country).name.common);
+  // // console.log('randonCountry:', randonCountry.name.common);
+  // console.log('activeCountry:', activeCountry);
+  // console.groupEnd()
 
   // useEffect(() => {
   //   if (skipCountry) {
@@ -105,7 +105,7 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   }
 
   const handleSubmitAnswer = (value: string) => {
-    console.log('value:', value, 'activeCountry:', (activeCountry as Country).name.common)
+    // console.log('value:', value, 'activeCountry:', (activeCountry as Country).name.common)
     if (value.toLowerCase() === (activeCountry as Country).name.common.toLowerCase()) {
       console.log('Correct!')
       setIsCorrect(true);
@@ -115,16 +115,10 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
     }
   }
 
-  const handleCloseNotification = () => {
-    console.log('hey!')
-    setCanCheckAnswer(false);
-  }
-
-  // useEffect(() => {
-  //   setCanCheckAnswer(false)
-  // }, [isCorrect])
-
-  console.log('%ccanCheckAnswer:', 'color:tomato', canCheckAnswer);
+  // const handleCloseNotification = () => {
+  //   console.log('hey!')
+  //   setCanCheckAnswer(false);
+  // }
 
   return (
     <Modal opened={opened} onClose={close} title="Quick Play" centered>
@@ -165,7 +159,7 @@ function WelcomeModal(props: WelcomeModalProps): JSX.Element {
 
   return (
     <Modal opened={opened} onClose={close} title="Welcome to Banderas!" centered>
-      <Tabs style={{border: '1px solid tomato'}} orientation="vertical" defaultValue="welcome">
+      <Tabs style={{color: "#000", display: "flex", justifyContent: "center", alignItems: "center"}} orientation="vertical" defaultValue="welcome">
         <Tabs.List>
           <Tabs.Tab value="welcome">
             Welcome
@@ -181,11 +175,11 @@ function WelcomeModal(props: WelcomeModalProps): JSX.Element {
           </Tabs.Tab>
         </Tabs.List>
 
-        <Tabs.Panel value="welcome">
+        <Tabs.Panel value="welcome" style={{ padding: "20px"}}>
           Banderas is a game where you guess the country based on its flag.
         </Tabs.Panel>
 
-        <Tabs.Panel value="quick play">
+        <Tabs.Panel value="quick play" style={{ padding: "20px"}}>
           <Button onClick={() => {
             props.handleSetIsQuickPlay(true);
             close();
@@ -194,11 +188,11 @@ function WelcomeModal(props: WelcomeModalProps): JSX.Element {
           </Button>
         </Tabs.Panel>
 
-        <Tabs.Panel value="rapid">
+        <Tabs.Panel value="rapid" style={{ padding: "20px"}}>
           Rapid!
         </Tabs.Panel>
 
-        <Tabs.Panel value="explore">
+        <Tabs.Panel value="explore" style={{ padding: "20px"}}>
           {/* <Button onClick={() => {
             props.handleSetIsQuickPlay(true);
             close();
@@ -223,7 +217,7 @@ export default function Home(): JSX.Element {
 
   useEffect(() => {
     if (countries.length === 0) {
-      console.log('fetching countries')
+      // console.log('fetching countries')
       fetch("https://restcountries.com/v3.1/all")
         .then(res => res.json())
         .then(res => setCountries(res))
@@ -231,7 +225,7 @@ export default function Home(): JSX.Element {
     }
   }, [countries.length])
 
-  console.log('%ccountries:', 'color:tomato', countries);
+  // console.log('%ccountries:', 'color:tomato', countries);
 
   // window.scrollTo(0, document.body.scrollHeight);
   // window.scroll({top: document.body.scrollHeight, behavior: "smooth"});
