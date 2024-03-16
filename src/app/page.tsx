@@ -21,7 +21,7 @@ const SkipButton = (props: SkipButtonProps) => {
         setCountdown(countdown - 1);
       }, 1000);
       if (countdown === 0) {
-        setCountdown(3);
+        setCountdown(2);
         clearInterval(interval);
         setStartCountdown(false);
         props.handleSkipCountry();
@@ -107,7 +107,7 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
       setShowNotification(false);
       handleGetNewCountry();
       setValue('');
-    }, 2500)
+    }, 2000)
   }
 
   const handleCloseNotification = () => {
@@ -117,9 +117,9 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   const [showNotification, setShowNotification] = useState<boolean>(false);
 
   return (
-    <Modal opened={opened} onClose={close} title="Quick Play" centered>
+    <Modal style={{color: "#000"}} opened={opened} onClose={close} title="Quick Play" centered>
       <Stack>
-        <Box>What country is this?</Box>
+        <Box color='#000'>What country is this?</Box>
         {activeCountry && <Box><img style={{width:"100%"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
         <Stack>
           {showNotification && <NotificationComponent isCorrect={isCorrect} handleCloseNotification={handleCloseNotification} />}
