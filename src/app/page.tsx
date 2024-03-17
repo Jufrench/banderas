@@ -1,8 +1,8 @@
 'use client'
 
 import { useDisclosure } from '@mantine/hooks';
-import { rem, Modal, Stack, Box, Tabs, Text, Group, TextInput, Notification, Card, Paper, Title, Image, Button, Alert, lighten } from '@mantine/core';
-import { IconX, IconCheck, IconMoodCheck, IconMoodSad, IconExclamationMark, IconCornerDownRight } from '@tabler/icons-react';
+import { Modal, Stack, Box, Tabs, Text, TextInput, Image, Button, Alert, lighten, FocusTrap } from '@mantine/core';
+import { IconMoodCheck, IconMoodSad, IconCornerDownRight } from '@tabler/icons-react';
 
 import { useState, useEffect } from 'react'
 
@@ -38,35 +38,9 @@ const SkipButton = (props: SkipButtonProps) => {
 }
 
 const AnswerFeedbackComponent = (props: {answer: string, isCorrect: boolean | null, handleCloseNotification: () => void}): JSX.Element => {
-  // const iconMoodCheck = <IconMoodCheck />;
-  // const iconMoodSad = <IconMoodSad />;
-  // const iconExclamationMark = <IconExclamationMark />;
-  // return (
-  //   <>
-  //   {props.isCorrect ?
-  //     <Notification
-  //       withBorder
-  //       color="teal"
-  //       style={{borderColor: "#339999", background: "rgba(51, 153, 153, 0.3)"}}
-  //       icon={<IconCheck style={{ width: rem(20), height: rem(20) }} />}
-  //       onClose={() => props.handleCloseNotification()}>
-  //       Correct!
-  //     </Notification>
-  //     :
-  //       <Notification
-  //         withBorder
-  //         color="red"
-  //         style={{borderColor: "#c91a25", background: "rgba(201, 26, 37, 0.3)"}}
-  //         icon={<IconX style={{ width: rem(20), height: rem(20) }} />}
-  //         onClose={() => props.handleCloseNotification()}>
-  //           Incorrect!
-  //       </Notification>}
-  //   </>
-  // )
   return (
     <>
     {props.isCorrect ?
-      // <Alert title="Correct!" color="teal" icon={iconMoodCheck} />
       <Alert title="Correct!" color="teal" icon={<IconMoodCheck />} />
       :
       <Alert title="Incorrect!" color="#c91a25" icon={<IconMoodSad />}>
@@ -78,20 +52,6 @@ const AnswerFeedbackComponent = (props: {answer: string, isCorrect: boolean | nu
     </>
   )
 }
-
-// const TextInputComp = (props: {hasInputError: boolean, setInputValue: (value: string) => void}) => {
-//   const [value, setValue] = useState<string>('');
-
-//   return (
-//     <TextInput
-//     required={true}
-//     aria-label={props.hasInputError ? "Please enter a country name" : "Country name"}
-//     placeholder="Country name" size="lg"
-//     value={value}
-//     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
-//     style={{flexGrow: 1}} />
-//   )
-// };
 
 type Country = {
   name: {
@@ -106,12 +66,14 @@ type Country = {
 
 function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   const [opened, { open, close }] = useDisclosure(true);
+  const [active, { toggle }] = useDisclosure(true);
 
   const [activeCountry, setActiveCountry] = useState<{} | null>((props.countries[Math.floor(Math.random() * 250)] as Country));
   const [getNewCountry, setGetNewCountry] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [hasInputError, setHasInputError] = useState<boolean>(false);
+  const [showNotification, setShowNotification] = useState<boolean>(false);
 
   useEffect(() => {
     if (getNewCountry) {
@@ -126,17 +88,15 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   }
 
   const handleSubmitAnswer = (value: string) => {
-    console.log('value:', value)
+    toggle();
     if (value === '') {
       setHasInputError(true);
       return;
     }
 
     if (value.toLowerCase() === (activeCountry as Country).name.common.toLowerCase()) {
-      console.log('Correct!')
       setIsCorrect(true);
     } else {
-      console.log('Incorrect!')
       setIsCorrect(false);
     }
 
@@ -148,46 +108,34 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
     }, 2000)
   }
 
-  console.log('%chasInputError:', 'color: #ff0000', hasInputError)
-
-  // const handleSetInputValue = (value: string) => {
-  //   setValue(value);
-  // }
-
   const handleCloseNotification = () => {
     setShowNotification(false);
   }
 
-  const [showNotification, setShowNotification] = useState<boolean>(false);
-
   return (
     <Modal style={{color: "#000"}} opened={opened} onClose={close} title="Quick Play" centered>
       <Stack>
-        <Box color='#000'>What country is this?</Box>
+      <Box color='#000'>What country is this?</Box>
         {activeCountry && <Box><img style={{width:"100%", border: "1px solid #bcbcbc"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
-        <Stack>
-          {showNotification && <AnswerFeedbackComponent answer={(activeCountry as Country).name.common} isCorrect={isCorrect} handleCloseNotification={handleCloseNotification} />}
+        {showNotification && <AnswerFeedbackComponent answer={(activeCountry as Country).name.common} isCorrect={isCorrect} handleCloseNotification={handleCloseNotification} />}
+        <FocusTrap active={active}>
           <TextInput
-            required
+            styles={{input: {background: hasInputError ? lighten("#c91a25", 0.9) : "unset"}}}
             label="Country name"
             aria-label="Country name"
             placeholder={hasInputError ? "Country name required" : "Country name"}
             value={value}
             error={hasInputError ? "Error: input empty" : false}
+            required
+            data-autofocus
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
-            onFocus={() => setHasInputError(false)}
-            styles={{
-              input: {
-                background: hasInputError ? lighten("#c91a25", 0.9) : "unset"
-              }
-              
+            onFocus={() => {
+              setHasInputError(false);
+              if (active) toggle();
             }} />
-            {/* <TextInputComp
-              setInputValue={handleSetInputValue}
-              hasInputError={hasInputError}
-              /> */}
-          <Button color="teal" style={{color:"#fff"}} onClick={() => handleSubmitAnswer(value)}>Submit</Button>
-        </Stack>
+        </FocusTrap>
+        <Button color="teal" style={{color:"#fff"}}
+          onClick={() => handleSubmitAnswer(value)}>Submit</Button>
         <SkipButton handleSkipCountry={handleGetNewCountry} />
       </Stack>
     </Modal>
@@ -197,7 +145,6 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
 interface WelcomeModalProps {
   handleSetIsQuickPlay: (value: boolean) => void;
 }
-
 function WelcomeModal(props: WelcomeModalProps): JSX.Element {
   const [opened, { open, close }] = useDisclosure(true);
 
@@ -256,7 +203,6 @@ export default function Home(): JSX.Element {
 
   useEffect(() => {
     if (countries.length === 0) {
-      // console.log('fetching countries')
       fetch("https://restcountries.com/v3.1/all")
         .then(res => res.json())
         .then(res => setCountries(res))
