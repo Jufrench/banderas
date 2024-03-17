@@ -1,7 +1,7 @@
 'use client'
 
 import { useDisclosure } from '@mantine/hooks';
-import { rem, Modal, Stack, Box, Tabs, Text, Group, TextInput, Notification, Card, Paper, Title, Image, Button, Alert } from '@mantine/core';
+import { rem, Modal, Stack, Box, Tabs, Text, Group, TextInput, Notification, Card, Paper, Title, Image, Button, Alert, lighten } from '@mantine/core';
 import { IconX, IconCheck, IconMoodCheck, IconMoodSad, IconExclamationMark, IconCornerDownRight } from '@tabler/icons-react';
 
 import { useState, useEffect } from 'react'
@@ -37,7 +37,7 @@ const SkipButton = (props: SkipButtonProps) => {
   )
 }
 
-const NotificationComponent = (props: {answer: string, isCorrect: boolean | null, handleCloseNotification: () => void}): JSX.Element => {
+const AnswerFeedbackComponent = (props: {answer: string, isCorrect: boolean | null, handleCloseNotification: () => void}): JSX.Element => {
   // const iconMoodCheck = <IconMoodCheck />;
   // const iconMoodSad = <IconMoodSad />;
   // const iconExclamationMark = <IconExclamationMark />;
@@ -69,7 +69,7 @@ const NotificationComponent = (props: {answer: string, isCorrect: boolean | null
       // <Alert title="Correct!" color="teal" icon={iconMoodCheck} />
       <Alert title="Correct!" color="teal" icon={<IconMoodCheck />} />
       :
-      <Alert title="Incorrect!" color="red" icon={<IconMoodSad />}>
+      <Alert title="Incorrect!" color="#c91a25" icon={<IconMoodSad />}>
         <Text style={{display: "flex"}}>
           <IconCornerDownRight />
           <Text ml="4" span>{props.answer}</Text>
@@ -78,6 +78,20 @@ const NotificationComponent = (props: {answer: string, isCorrect: boolean | null
     </>
   )
 }
+
+// const TextInputComp = (props: {hasInputError: boolean, setInputValue: (value: string) => void}) => {
+//   const [value, setValue] = useState<string>('');
+
+//   return (
+//     <TextInput
+//     required={true}
+//     aria-label={props.hasInputError ? "Please enter a country name" : "Country name"}
+//     placeholder="Country name" size="lg"
+//     value={value}
+//     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
+//     style={{flexGrow: 1}} />
+//   )
+// };
 
 type Country = {
   name: {
@@ -97,6 +111,7 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   const [getNewCountry, setGetNewCountry] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [hasInputError, setHasInputError] = useState<boolean>(false);
 
   useEffect(() => {
     if (getNewCountry) {
@@ -111,6 +126,12 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   }
 
   const handleSubmitAnswer = (value: string) => {
+    console.log('value:', value)
+    if (value === '') {
+      setHasInputError(true);
+      return;
+    }
+
     if (value.toLowerCase() === (activeCountry as Country).name.common.toLowerCase()) {
       console.log('Correct!')
       setIsCorrect(true);
@@ -127,6 +148,12 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
     }, 2000)
   }
 
+  console.log('%chasInputError:', 'color: #ff0000', hasInputError)
+
+  // const handleSetInputValue = (value: string) => {
+  //   setValue(value);
+  // }
+
   const handleCloseNotification = () => {
     setShowNotification(false);
   }
@@ -139,13 +166,26 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
         <Box color='#000'>What country is this?</Box>
         {activeCountry && <Box><img style={{width:"100%", border: "1px solid #bcbcbc"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
         <Stack>
-          {showNotification && <NotificationComponent answer={(activeCountry as Country).name.common} isCorrect={isCorrect} handleCloseNotification={handleCloseNotification} />}
+          {showNotification && <AnswerFeedbackComponent answer={(activeCountry as Country).name.common} isCorrect={isCorrect} handleCloseNotification={handleCloseNotification} />}
           <TextInput
+            required
+            label="Country name"
             aria-label="Country name"
-            placeholder="Country name" size="lg"
+            placeholder={hasInputError ? "Country name required" : "Country name"}
             value={value}
+            error={hasInputError ? "Error: input empty" : false}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
-            style={{flexGrow: 1}} />
+            onFocus={() => setHasInputError(false)}
+            styles={{
+              input: {
+                background: hasInputError ? lighten("#c91a25", 0.9) : "unset"
+              }
+              
+            }} />
+            {/* <TextInputComp
+              setInputValue={handleSetInputValue}
+              hasInputError={hasInputError}
+              /> */}
           <Button color="teal" style={{color:"#fff"}} onClick={() => handleSubmitAnswer(value)}>Submit</Button>
         </Stack>
         <SkipButton handleSkipCountry={handleGetNewCountry} />
@@ -171,12 +211,12 @@ function WelcomeModal(props: WelcomeModalProps): JSX.Element {
           <Tabs.Tab value="quick play">
             Quick Play
           </Tabs.Tab>
-          <Tabs.Tab value="rapid">
+          {/* <Tabs.Tab value="rapid">
             Rapid
-          </Tabs.Tab>
-          <Tabs.Tab value="explore">
+          </Tabs.Tab> */}
+          {/* <Tabs.Tab value="explore">
             Explore
-          </Tabs.Tab>
+          </Tabs.Tab> */}
         </Tabs.List>
 
         <Tabs.Panel value="welcome" style={{ padding: "20px"}}>
@@ -192,18 +232,13 @@ function WelcomeModal(props: WelcomeModalProps): JSX.Element {
           </Button>
         </Tabs.Panel>
 
-        <Tabs.Panel value="rapid" style={{ padding: "20px"}}>
+        {/* <Tabs.Panel value="rapid" style={{ padding: "20px"}}>
           Rapid!
-        </Tabs.Panel>
+        </Tabs.Panel> */}
 
-        <Tabs.Panel value="explore" style={{ padding: "20px"}}>
-          {/* <Button onClick={() => {
-            props.handleSetIsQuickPlay(true);
-            close();
-            }}> */}
-            Explore
-          {/* </Button> */}
-        </Tabs.Panel>
+        {/* <Tabs.Panel value="explore" style={{ padding: "20px"}}>
+          Explore
+        </Tabs.Panel> */}
           
       </Tabs>
     </Modal>
