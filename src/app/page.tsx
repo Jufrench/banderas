@@ -64,7 +64,7 @@ type Country = {
   }
 }
 
-function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
+function QuickPlayModal(props: {openWelcomeModal: () => void, countries: {}[], handleSetIsQuickPlay: (value: boolean) => void}): JSX.Element {
   const [opened, { open, close }] = useDisclosure(true);
   const [active, { toggle }] = useDisclosure(true);
 
@@ -113,7 +113,16 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
   }
 
   return (
-    <Modal style={{color: "#000"}} opened={opened} onClose={close} title="Quick Play" centered>
+    <Modal
+      centered
+      title="Quick Play"
+      style={{color: "#000"}}
+      opened={opened}
+      onClose={() => {
+        close();
+        props.handleSetIsQuickPlay(false);
+        props.openWelcomeModal();
+      }}>
       <Stack>
       <Box color='#000'>What country is this?</Box>
         {activeCountry && <Box><img style={{width:"100%", border: "1px solid #bcbcbc"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
@@ -134,8 +143,9 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
               if (active) toggle();
             }} />
         </FocusTrap>
-        <Button color="teal" style={{color:"#fff"}}
-          onClick={() => handleSubmitAnswer(value)}>Submit</Button>
+        <Button color="teal" style={{color:"#fff"}} onClick={() => handleSubmitAnswer(value)}>
+          Submit
+        </Button>
         <SkipButton handleSkipCountry={handleGetNewCountry} />
       </Stack>
     </Modal>
@@ -143,21 +153,23 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
 }
 
 interface WelcomeModalProps {
+  opened: boolean;
+  open: () => void;
+  close: () => void;
   handleSetIsQuickPlay: (value: boolean) => void;
 }
 function WelcomeModal(props: WelcomeModalProps): JSX.Element {
-  const [opened, { open, close }] = useDisclosure(true);
-
+  // const [opened, { open, close }] = useDisclosure(true);
   return (
-    <Modal opened={opened} onClose={close} title="Welcome to Banderas!" centered>
+    <Modal opened={props.opened} onClose={props.close} title="Welcome to Banderas!" centered>
       <Tabs style={{color: "#000", display: "flex", justifyContent: "center", alignItems: "center"}} orientation="vertical" defaultValue="welcome">
         <Tabs.List>
           <Tabs.Tab value="welcome">
             Welcome
           </Tabs.Tab>
-          <Tabs.Tab value="quick play">
+          {/* <Tabs.Tab value="quick play">
             Quick Play
-          </Tabs.Tab>
+          </Tabs.Tab> */}
           {/* <Tabs.Tab value="rapid">
             Rapid
           </Tabs.Tab> */}
@@ -167,17 +179,28 @@ function WelcomeModal(props: WelcomeModalProps): JSX.Element {
         </Tabs.List>
 
         <Tabs.Panel value="welcome" style={{ padding: "20px"}}>
-          Banderas is a game where you guess the country based on its flag.
+          <Stack>
+            <Text>A game where you guess the country based on its flag.</Text>
+            <Text>Ty out <Text span c="teal">Quick Play</Text>! It&#39;s the quickest way to get started.</Text>
+            <Button
+              styles={{root: {background: "rgb(18, 184, 134)"}}}
+              onClick={() => {
+              props.handleSetIsQuickPlay(true);
+              props.close();
+            }}>
+            Quick Play
+          </Button>
+          </Stack>
         </Tabs.Panel>
 
-        <Tabs.Panel value="quick play" style={{ padding: "20px"}}>
+        {/* <Tabs.Panel value="quick play" style={{ padding: "20px"}}>
           <Button onClick={() => {
             props.handleSetIsQuickPlay(true);
             close();
             }}>
             Quick Play
           </Button>
-        </Tabs.Panel>
+        </Tabs.Panel> */}
 
         {/* <Tabs.Panel value="rapid" style={{ padding: "20px"}}>
           Rapid!
@@ -196,9 +219,10 @@ export default function Home(): JSX.Element {
 
   const [countries, setCountries] = useState<{}[]>([]);
   const [isQuickPlay, setIsQuickPlay] = useState<boolean>(false);
+  const [opened, { open, close }] = useDisclosure(true);
 
   const handleSetIsQuickPlay = () => {
-    setIsQuickPlay(true);
+    setIsQuickPlay(prevState => !prevState);
   }
 
   useEffect(() => {
@@ -215,8 +239,8 @@ export default function Home(): JSX.Element {
 
   return (
     <>
-      <WelcomeModal handleSetIsQuickPlay={handleSetIsQuickPlay} />
-      {isQuickPlay && <QuickPlayModal countries={countries} />}
+      <WelcomeModal opened={opened} open={open} close={close} handleSetIsQuickPlay={handleSetIsQuickPlay} />
+      {isQuickPlay && <QuickPlayModal openWelcomeModal={open} countries={countries} handleSetIsQuickPlay={handleSetIsQuickPlay} />}
       <main className={styles.main}>
         <ul
           style={{
