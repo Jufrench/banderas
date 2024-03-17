@@ -1,8 +1,8 @@
 'use client'
 
 import { useDisclosure } from '@mantine/hooks';
-import { rem, Modal, Stack, Box, Tabs, Group, TextInput, Notification, Card, Paper, Title, Image, Button } from '@mantine/core';
-import { IconX, IconCheck } from '@tabler/icons-react';
+import { rem, Modal, Stack, Box, Tabs, Text, Group, TextInput, Notification, Card, Paper, Title, Image, Button, Alert } from '@mantine/core';
+import { IconX, IconCheck, IconMoodCheck, IconMoodSad, IconExclamationMark, IconCornerDownRight } from '@tabler/icons-react';
 
 import { useState, useEffect } from 'react'
 
@@ -37,27 +37,44 @@ const SkipButton = (props: SkipButtonProps) => {
   )
 }
 
-const NotificationComponent = (props: {isCorrect: boolean | null, handleCloseNotification: () => void}): JSX.Element => {
+const NotificationComponent = (props: {answer: string, isCorrect: boolean | null, handleCloseNotification: () => void}): JSX.Element => {
+  // const iconMoodCheck = <IconMoodCheck />;
+  // const iconMoodSad = <IconMoodSad />;
+  // const iconExclamationMark = <IconExclamationMark />;
+  // return (
+  //   <>
+  //   {props.isCorrect ?
+  //     <Notification
+  //       withBorder
+  //       color="teal"
+  //       style={{borderColor: "#339999", background: "rgba(51, 153, 153, 0.3)"}}
+  //       icon={<IconCheck style={{ width: rem(20), height: rem(20) }} />}
+  //       onClose={() => props.handleCloseNotification()}>
+  //       Correct!
+  //     </Notification>
+  //     :
+  //       <Notification
+  //         withBorder
+  //         color="red"
+  //         style={{borderColor: "#c91a25", background: "rgba(201, 26, 37, 0.3)"}}
+  //         icon={<IconX style={{ width: rem(20), height: rem(20) }} />}
+  //         onClose={() => props.handleCloseNotification()}>
+  //           Incorrect!
+  //       </Notification>}
+  //   </>
+  // )
   return (
     <>
     {props.isCorrect ?
-      <Notification
-        withBorder
-        color="teal"
-        style={{borderColor: "#339999", background: "rgba(51, 153, 153, 0.3)"}}
-        icon={<IconCheck style={{ width: rem(20), height: rem(20) }} />}
-        onClose={() => props.handleCloseNotification()}>
-        Correct!
-      </Notification>
+      // <Alert title="Correct!" color="teal" icon={iconMoodCheck} />
+      <Alert title="Correct!" color="teal" icon={<IconMoodCheck />} />
       :
-      <Notification
-        withBorder
-        color="red"
-        style={{borderColor: "#c91a25", background: "rgba(201, 26, 37, 0.3)"}}
-        icon={<IconX style={{ width: rem(20), height: rem(20) }} />}
-        onClose={() => props.handleCloseNotification()}>
-          Incorrect!
-      </Notification>}
+      <Alert title="Incorrect!" color="red" icon={<IconMoodSad />}>
+        <Text style={{display: "flex"}}>
+          <IconCornerDownRight />
+          <Text ml="4" span>{props.answer}</Text>
+        </Text>
+      </Alert>}
     </>
   )
 }
@@ -122,7 +139,7 @@ function QuickPlayModal(props: {countries: {}[]}): JSX.Element {
         <Box color='#000'>What country is this?</Box>
         {activeCountry && <Box><img style={{width:"100%", border: "1px solid #bcbcbc"}}src={`${(activeCountry as Country).flags.png}`} /></Box>}
         <Stack>
-          {showNotification && <NotificationComponent isCorrect={isCorrect} handleCloseNotification={handleCloseNotification} />}
+          {showNotification && <NotificationComponent answer={(activeCountry as Country).name.common} isCorrect={isCorrect} handleCloseNotification={handleCloseNotification} />}
           <TextInput
             aria-label="Country name"
             placeholder="Country name" size="lg"
